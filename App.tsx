@@ -215,7 +215,17 @@ const App: React.FC = () => {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error("Logout error, forcing local cleanup:", error);
+    } finally {
+      // Force local state cleanup even if network request fails
+      setSession(null);
+      setHistory([]);
+      setSavedItems([]);
+      setUserProfile(null);
+    }
   };
 
   const updateProfile = async (updates: any) => {
