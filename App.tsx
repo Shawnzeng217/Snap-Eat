@@ -51,6 +51,10 @@ const App: React.FC = () => {
         setHistory([]);
         setSavedItems([]);
         setUserProfile(null);
+        // Fix: Clear session-specific search results and inputs
+        setCurrentResults([]);
+        setUploadedImage(null);
+        setCurrentScreen('home');
       }
     });
 
@@ -222,9 +226,14 @@ const App: React.FC = () => {
     } finally {
       // Force local state cleanup even if network request fails
       setSession(null);
+      setSession(null);
       setHistory([]);
       setSavedItems([]);
       setUserProfile(null);
+      // Fix: Clear session-specific search results and inputs
+      setCurrentResults([]);
+      setUploadedImage(null);
+      setCurrentScreen('home');
     }
   };
 

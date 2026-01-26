@@ -99,7 +99,7 @@ export const Scanning: React.FC<ScanningProps> = ({ uploadedImage, targetLanguag
         // 5. Construct Prompt with Accuracy Optimization
         // Critical optimization: Tell AI to use Knowledge Base for menus, and Visuals for dishes.
         const accuracyPrompt = scanType === 'menu'
-          ? "ACCURACY RULE: Since this is a menu (text), you CANNOT see the food. You MUST infer 'spiceLevel', 'allergens', and 'tags' solely based on your CULINARY KNOWLEDGE of the dish name and traditional preparation methods. Do not guess based on visual text features."
+          ? "ACCURACY RULE: Since this is a menu (text), you CANNOT see the food. You MUST infer 'spiceLevel', 'allergens', and 'tags' solely based on your CULINARY KNOWLEDGE of the dish name and traditional preparation methods. Do not guess based on visual text features. IMPORTANT: Use the menu section headers to infer the full dish name (e.g. if 'Soft Shell Crab' is listed under 'Sushi Rolls', the dish name is 'Soft Shell Crab Sushi Roll')."
           : "ACCURACY RULE: Infer 'spiceLevel' and 'allergens' based on VISUAL INSPECTION of the food (e.g., redness, visible chilies, ingredients) combined with dish identification.";
 
         const response = await ai.models.generateContent({
@@ -150,9 +150,17 @@ export const Scanning: React.FC<ScanningProps> = ({ uploadedImage, targetLanguag
           const searchQuery = `${d.originalName || ''} ${d.englishName || d.name} food dish`.trim();
 
           // c=7 is smart crop, w/h sets dimensions, rs=1 resizes
-          const imageUrl = isMenu
-            ? `https://tse2.mm.bing.net/th?q=${encodeURIComponent(searchQuery)}&w=400&h=400&c=7&rs=1&p=0`
-            : uploadedImage;
+          // LOGIC UPDATE:
+          // 1. For MENUS: Use Bing Image Search (persistent URL).
+          // 2. For DISHES: Use the ORIGINAL captured photo. To ensure persistence in Supabase without Storage, we use the Base64 data string.
+          let imageUrl;
+
+          if (isMenu) {
+            imageUrl = `https://tse2.mm.bing.net/th?q=${encodeURIComponent(searchQuery)}&w=400&h=400&c=7&rs=1&p=0`;
+          } else {
+            // Reconstruct the Base64 Data URL for the DB
+            imageUrl = `data:image/jpeg;base64,${base64Image}`;
+          }
 
           return {
             ...d,
