@@ -103,7 +103,7 @@ export const Scanning: React.FC<ScanningProps> = ({ uploadedImage, targetLanguag
           : "ACCURACY RULE: Infer 'spiceLevel' and 'allergens' based on VISUAL INSPECTION of the food (e.g., redness, visible chilies, ingredients) combined with dish identification.";
 
         const response = await ai.models.generateContent({
-          model: 'gemini-3-flash-preview',
+          model: 'gemini-2.0-flash',
           contents: {
             parts: [
               { inlineData: { mimeType: 'image/jpeg', data: base64Image } },

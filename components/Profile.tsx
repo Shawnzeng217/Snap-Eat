@@ -145,7 +145,7 @@ export const Profile: React.FC<ProfileProps> = ({
         try {
             const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
             const response = await ai.models.generateContent({
-                model: 'gemini-3-flash-preview',
+                model: 'gemini-2.0-flash',
                 contents: {
                     parts: [
                         { text: `Translate the following dietary restriction note into ${defaultLanguage} for a chef to read. Keep it clear, polite and concise. Return ONLY the translated text.\n\nText: "${dietaryNotes}"` }
