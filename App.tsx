@@ -317,8 +317,8 @@ const App: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-background-light dark:bg-background-dark">
-        <span className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></span>
+      <div className="flex items-center justify-center h-screen bg-background-light dark:bg-background-dark select-none cursor-default">
+        <span className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin pointer-events-none"></span>
       </div>
     );
   }

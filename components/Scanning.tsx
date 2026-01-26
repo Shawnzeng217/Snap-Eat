@@ -223,7 +223,7 @@ export const Scanning: React.FC<ScanningProps> = ({ uploadedImage, targetLanguag
       <div className="flex flex-col items-center justify-center flex-grow px-6 w-full mx-auto">
 
         {/* Visual Scanner */}
-        <div className="relative flex items-center justify-center mb-10">
+        <div className="relative flex items-center justify-center mb-10 select-none pointer-events-none">
           <div className="absolute w-72 h-72 rounded-full border border-primary/10 animate-ping" style={{ animationDuration: '3s' }}></div>
           <div className="absolute w-80 h-80 rounded-full border border-primary/5 animate-pulse"></div>
 
