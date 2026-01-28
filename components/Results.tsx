@@ -19,7 +19,20 @@ export const Results: React.FC<ResultsProps> = ({ uploadedImage, results, savedI
     // State for Detail Modal
     const [selectedItem, setSelectedItem] = useState<Dish | null>(null);
     // State for Detail Modal Toggle (Only relevant for Menu Mode)
+    // State for Detail Modal Toggle (Only relevant for Menu Mode)
     const [modalViewMode, setModalViewMode] = useState<'food' | 'scan'>('food');
+
+    // Prevent body scroll when modal is open
+    React.useEffect(() => {
+        if (selectedItem) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [selectedItem]);
 
     // --- Helpers ---
 
@@ -311,7 +324,7 @@ export const Results: React.FC<ResultsProps> = ({ uploadedImage, results, savedI
 
             {/* Detail Modal (Used for items in ListView) */}
             {selectedItem && (
-                <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center pointer-events-none">
+                <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center pointer-events-none">
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm pointer-events-auto transition-opacity" onClick={() => setSelectedItem(null)}></div>
 
                     <div className="relative w-full max-w-md bg-white dark:bg-[#1a1a1a] rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl pointer-events-auto animate-[slideUp_0.3s_ease-out] sm:animate-[scaleIn_0.2s_ease-out] max-h-[90vh] flex flex-col">

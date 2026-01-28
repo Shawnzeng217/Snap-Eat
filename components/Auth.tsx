@@ -59,8 +59,8 @@ export const Auth: React.FC = () => {
 
                     {message && (
                         <div className={`p-3 rounded-lg text-sm mb-4 font-medium ${message.type === 'error'
-                                ? 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-300'
-                                : 'bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-300'
+                            ? 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-300'
+                            : 'bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-300'
                             }`}>
                             {message.text}
                         </div>
@@ -122,6 +122,12 @@ export const Auth: React.FC = () => {
                             </button>
                         </p>
                     </div>
+                </div>
+
+                <div className="mt-8 text-center space-y-1">
+                    <p className="text-xs text-gray-400">测试账号和密码：</p>
+                    <p className="text-xs text-gray-500 font-medium select-all">test@hilton.com</p>
+                    <p className="text-xs text-gray-500 font-medium select-all">password123</p>
                 </div>
             </div>
         </div>
