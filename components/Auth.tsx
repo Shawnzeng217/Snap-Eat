@@ -4,8 +4,8 @@ import { supabase } from '../lib/supabase';
 
 export const Auth: React.FC = () => {
     const [loading, setLoading] = useState(false);
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [email, setEmail] = useState('test@hilton.com');
+    const [password, setPassword] = useState('password123');
     const [isSignUp, setIsSignUp] = useState(false);
     const [message, setMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null);
 
