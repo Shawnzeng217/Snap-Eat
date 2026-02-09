@@ -21,6 +21,7 @@ export const Results: React.FC<ResultsProps> = ({ uploadedImage, results, savedI
     // State for Detail Modal Toggle (Only relevant for Menu Mode)
     // State for Detail Modal Toggle (Only relevant for Menu Mode)
     const [modalViewMode, setModalViewMode] = useState<'food' | 'scan'>('food');
+    const [modalImageDims, setModalImageDims] = useState({ w: 0, h: 0 });
 
     // Prevent body scroll when modal is open
     React.useEffect(() => {
@@ -95,9 +96,26 @@ export const Results: React.FC<ResultsProps> = ({ uploadedImage, results, savedI
         const cx = (xmin + xmax) / 2 / 10;
         const cy = (ymin + ymax) / 2 / 10;
 
+        // Calculate dimensions of the bounding box as percentage (0-100)
+        // Correct way is: (xmax - xmin)/1000 * 100 = (xmax - xmin)/10
+        const wPct = (xmax - xmin) / 10;
+        const hPct = (ymax - ymin) / 10;
+
+        // Target: We want the box to take up roughly ~60% of the viewport width/height
+        // Scale = TargetCoverage / ActualCoverage
+        // E.g. If box is 10% wide, scale = 60/10 = 6x zoom (Too high? Clamp it)
+        const scaleW = 60 / Math.max(wPct, 1);
+        const scaleH = 40 / Math.max(hPct, 1); // 40% height because we have text below
+
+        // Use the smaller scale so it fits both dimensions
+        const rawScale = Math.min(scaleW, scaleH);
+
+        // Clamp scale: Minimum 1.5x (to show context), Maximum 4.0x (to avoid pixelation)
+        const finalScale = Math.min(Math.max(rawScale, 1.5), 4.0);
+
         return {
             transformOrigin: `${cx}% ${cy}%`,
-            transform: 'scale(2.0)', // 2x Zoom to read text clearly
+            transform: `scale(${finalScale.toFixed(2)})`,
         };
     };
 
@@ -388,21 +406,37 @@ export const Results: React.FC<ResultsProps> = ({ uploadedImage, results, savedI
                                         src={uploadedImage || ''}
                                         alt="Scan Context"
                                         className="w-full h-full object-contain bg-black/50"
+                                        onLoad={(e) => {
+                                            const img = e.target as HTMLImageElement;
+                                            // Store natural dimensions on the element dataset for easier access in State if needed, 
+                                            // but specifically for the SVG we need a re-render.
+                                            // Using a simpler approach: Force render the SVG with correct aspect ratio.
+                                            // Since we are inside a map or conditional, we'll iterate the SVG logic.
+                                            img.dataset.naturalWidth = img.naturalWidth.toString();
+                                            img.dataset.naturalHeight = img.naturalHeight.toString();
+                                            // Trigger a re-render to update SVG viewBox
+                                            setModalImageDims({ w: img.naturalWidth, h: img.naturalHeight });
+                                        }}
                                     />
-                                    {/* Spotlight Bounding Box */}
-                                    {selectedItem.boundingBox && (
-                                        <div
-                                            className="absolute z-10 pointer-events-none shadow-[0_0_0_9999px_rgba(0,0,0,0.7)]"
-                                            style={{
-                                                top: `${selectedItem.boundingBox[0] / 10}%`,
-                                                left: `${selectedItem.boundingBox[1] / 10}%`,
-                                                height: `${(selectedItem.boundingBox[2] - selectedItem.boundingBox[0]) / 10}%`,
-                                                width: `${(selectedItem.boundingBox[3] - selectedItem.boundingBox[1]) / 10}%`,
-                                            }}
+                                    {/* Spotlight Bounding Box - SVG Implementation for Perfect Alignment */}
+                                    {selectedItem.boundingBox && modalImageDims.w > 0 && (
+                                        <svg
+                                            className="absolute inset-0 w-full h-full pointer-events-none"
+                                            viewBox={`0 0 ${modalImageDims.w} ${modalImageDims.h}`}
+                                            preserveAspectRatio="xMidYMid meet"
                                         >
-                                            {/* Box Border */}
-                                            <div className="w-full h-full border-2 border-primary shadow-[0_0_15px_rgba(230,80,0,0.5)] animate-pulse"></div>
-                                        </div>
+                                            <rect
+                                                x={selectedItem.boundingBox[1] * (modalImageDims.w / 1000)}
+                                                y={selectedItem.boundingBox[0] * (modalImageDims.h / 1000)}
+                                                width={(selectedItem.boundingBox[3] - selectedItem.boundingBox[1]) * (modalImageDims.w / 1000)}
+                                                height={(selectedItem.boundingBox[2] - selectedItem.boundingBox[0]) * (modalImageDims.h / 1000)}
+                                                fill="none"
+                                                stroke="#e65000"
+                                                strokeWidth={Math.max(2, modalImageDims.w / 200)} // Dynamic stroke width based on image size
+                                                className="animate-[pulse_2s_infinite] shadow-[0_0_15px_rgba(230,80,0,0.5)]"
+                                                style={{ filter: "drop-shadow(0 0 4px rgba(230,80,0,0.5))" }}
+                                            />
+                                        </svg>
                                     )}
                                 </div>
                             )}
